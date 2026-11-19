@@ -3,6 +3,9 @@
 <meta charset="utf-8">
 <script>try{if(!localStorage.getItem("dh_cache_v2")){document.documentElement.classList.add("ld");}}catch(e){document.documentElement.classList.add("ld");}</script>
 <link rel="preconnect" href="https://ribtxcpitisqzxlirqiq.supabase.co" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Deck House</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&amp;family=Lato:wght@400;700&amp;display=swap">
@@ -193,7 +196,6 @@ body.am .edb{display:flex}
 footer{padding:22px 12px}.pb{min-width:38px;height:38px}
 }
 #site>.hero,#site>.strip,#site>.about,#site>main{transition:opacity .4s}
-html.ld #site>.hero,html.ld #site>.strip,html.ld #site>.about,html.ld #site>main{opacity:0}
 .art img,.pc.im img{opacity:0;transition:opacity .45s ease}.art img.ok,.pc.im img.ok{opacity:1}
 .pc.im{background:linear-gradient(145deg,#6b1a28,#1a060b)}
 
@@ -268,7 +270,10 @@ header{background:var(--black);border-bottom:2px solid var(--gold)}
 .thumbs button{flex:0 0 calc((100% - 32px)/5);aspect-ratio:1;padding:0;border:2px solid transparent;border-radius:8px;overflow:hidden;background:#000;cursor:pointer;opacity:.65;transition:opacity .2s,border-color .2s}
 .thumbs button.on{border-color:var(--gold);opacity:1}.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
 #site>.herow,#site>.exc{transition:opacity .4s}
-html.ld #site>.herow,html.ld #site>.exc{opacity:0}
+.sk{pointer-events:none;border-color:#d9ac5233;background:linear-gradient(100deg,#1a0a0e 30%,#2d1219 50%,#1a0a0e 70%);background-size:200% 100%;animation:shim 1.3s linear infinite}
+@keyframes shim{to{background-position:-200% 0}}
+html.ld .hx-info>*,html.ld .hx-tabs button,html.ld .hx-ar{visibility:hidden}
+html.ld .hx-st{background:linear-gradient(100deg,#0a0506 30%,#2d1219 50%,#0a0506 70%);background-size:200% 100%;animation:shim 1.3s linear infinite}
 .am-box{display:block;width:min(980px,100%);padding:26px}
 .exc{padding-top:70px}.exd{display:flex;align-items:center;gap:14px;color:var(--gold);margin:0 0 26px}.exd i{flex:1;height:0;border-top:3px double var(--gold)}
 .exc h2{text-align:left;margin:0 0 18px}
@@ -461,7 +466,7 @@ function hgo(i,keep){
 }
 function renderHero(){
   var L=heroList(),w=document.querySelector(".herow");
-  if(!L.length){w.style.display="none";clearTimeout(htm);hsig="";return;}
+  if(!L.length){w.style.display=document.documentElement.classList.contains("ld")?"":"none";clearTimeout(htm);hsig="";return;}
   w.style.display="";
   var sig=JSON.stringify(L.map(function(p){return [p.id,p.name,(p.imgs||[])[0]||"",p.c1,p.c2,p.s];}));
   if(sig!==hsig){
@@ -496,7 +501,7 @@ function renderGrid(){
   var cur=list.slice((page-1)*PER,page*PER);
   $("grid").innerHTML=cur.length?cur.map(function(p,x){
     return '<div class="card rv" style="transition-delay:'+(x%4*50)+'ms" data-id="'+p.id+'"><button class="edb" data-edit="'+p.id+'" aria-label="Editar en el panel">✎ #'+((page-1)*PER+x+1)+'</button>'+gal(p)+'<div class="ov"><h3>'+esc(p.name)+'</h3><div class="meta">'+esc(S.brand)+'<span>'+money(p.price)+'</span></div>'+btnHtml(p)+'</div></div>';
-  }).join(""):'<div class="none" style="grid-column:1/-1">'+(LOADING?"Cargando barajas…":"Pronto habrá nuevas barajas.")+'</div>';
+  }).join(""):(LOADING?'<div class="card sk"></div>'.repeat(6):'<div class="none" style="grid-column:1/-1">Pronto habrá nuevas barajas.</div>');
   renderPager(tp);renderExc();renderHero();initReveal();
 }
 function openModal(id){
@@ -861,6 +866,6 @@ renderText();buildTrack();renderGrid();
     LOADING=false;
     if(!HAS){$("grid").innerHTML='<div class="none" style="grid-column:1/-1">No se pudo cargar el catálogo. Revisa tu conexión e intenta de nuevo.</div>';}
   }
-  document.documentElement.classList.remove("ld");
+  document.documentElement.classList.remove("ld");renderHero();
 })();
 </script></body></html>
