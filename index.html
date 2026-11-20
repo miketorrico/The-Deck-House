@@ -187,12 +187,16 @@ body.am .edb{display:flex}
 .spin{width:56px;height:56px;border:5px solid #d9ac5244;border-top-color:var(--gold);border-radius:50%;animation:rot .8s linear infinite}@keyframes rot{to{transform:rotate(360deg)}}
 .pw{position:relative;display:block}.pw input{padding-right:46px}.eye{position:absolute;right:6px;top:calc(50% + 2px);transform:translateY(-50%);background:none;border:0;cursor:pointer;font-size:1.2rem;padding:6px;line-height:1;color:var(--gold)}
 @media(max-width:640px){
-.grid{grid-template-columns:repeat(2,1fr);gap:12px}
-.card{border-radius:14px}
-.ov{padding:30px 9px 9px}.ov h3{font-size:.95rem}
-.meta{flex-direction:column;align-items:flex-start;gap:2px;margin:4px 0 6px;font-size:.62rem;letter-spacing:.08em}.meta span{font-size:.85rem}
-.ov .add{padding:6px;font-size:.82rem;border-radius:8px}
-.edb{top:6px;left:6px;padding:4px 8px;font-size:.7rem}
+.grid{grid-template-columns:repeat(2,1fr);gap:16px}
+.card{aspect-ratio:auto;display:flex;flex-direction:column;background:#14100e;border:1px solid #d9ac5244;border-radius:14px;box-shadow:none}
+.card .gal{position:relative;inset:auto;aspect-ratio:1/1;flex:none}
+.card .ov{position:static;background:none;padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
+.card .ov h3{font-size:1.05rem;line-height:1.2}
+.card .meta{margin:0;font-size:0;letter-spacing:0;display:block}
+.card .meta span{font-size:1.1rem;letter-spacing:0}
+.card .ov .add{padding:8px;font-size:1rem;border-radius:10px}
+.card .ov .sold{margin:0}
+.edb{top:8px;left:8px;padding:4px 9px;font-size:.72rem}
 }
 @media(max-width:480px){
 .row{padding:8px 12px}.brand{font-size:.95rem;letter-spacing:0}.acts{gap:6px}.cartbtn,.ib{padding:7px 11px;font-size:.9rem}
@@ -378,7 +382,7 @@ var TABS=[["general","General"],["hero","Hero"],["exclusivos","Exclusivos"],["pr
 var DEFLOGO=document.getElementById("emblem").getAttribute("src");
 function $(id){return document.getElementById(id);}
 function esc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
-function money(n){return CUR+" "+(Number(n)||0).toFixed(2).replace(/\.00$/,"");}
+function money(n){return CUR+" "+fmtPrice(n);}
 function norm(t){return (t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
 function byId(id){return S.products.filter(function(p){return p.id==id;})[0];}
 function sUrl(u){return /^https?:\/\//i.test(u||"")?u:"#";}
