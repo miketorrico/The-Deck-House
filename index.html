@@ -186,12 +186,20 @@ body.am #toast{z-index:60}
 body.am .edb{display:flex}
 .spin{width:56px;height:56px;border:5px solid #d9ac5244;border-top-color:var(--gold);border-radius:50%;animation:rot .8s linear infinite}@keyframes rot{to{transform:rotate(360deg)}}
 .pw{position:relative;display:block}.pw input{padding-right:46px}.eye{position:absolute;right:6px;top:calc(50% + 2px);transform:translateY(-50%);background:none;border:0;cursor:pointer;font-size:1.2rem;padding:6px;line-height:1;color:var(--gold)}
+@media(max-width:640px){
+.grid{grid-template-columns:repeat(2,1fr);gap:12px}
+.card{border-radius:14px}
+.ov{padding:30px 9px 9px}.ov h3{font-size:.95rem}
+.meta{flex-direction:column;align-items:flex-start;gap:2px;margin:4px 0 6px;font-size:.62rem;letter-spacing:.08em}.meta span{font-size:.85rem}
+.ov .add{padding:6px;font-size:.82rem;border-radius:8px}
+.edb{top:6px;left:6px;padding:4px 8px;font-size:.7rem}
+}
 @media(max-width:480px){
 .row{padding:8px 12px}.brand{font-size:.95rem;letter-spacing:0}.acts{gap:6px}.cartbtn,.ib{padding:7px 11px;font-size:.9rem}
 .hero{padding:34px 12px 40px}.hero p{font-size:.95rem}.sup{letter-spacing:.2em;font-size:.68rem}
 .sec{margin:60px 0 26px}.sec h2{letter-spacing:.1em;font-size:1.7rem}
 .about{padding-top:60px}.ab p{font-size:1.05rem}.ab h3{font-size:1.45rem}
-.ov{padding:40px 12px 12px}.ov h3{font-size:1.3rem}.ar{width:34px;height:34px}
+.ar{width:34px;height:34px}
 .mbox{padding:14px;gap:12px}.mi h3{font-size:1.35rem}.pill{padding:8px 18px 8px 12px;font-size:.95rem}
 footer{padding:22px 12px}.pb{min-width:38px;height:38px}
 }
@@ -618,8 +626,21 @@ function getP(path){var o=S,k=path.split(".");for(var i=0;i<k.length;i++){o=o[k[
 function setP(path,v){var o=S,k=path.split(".");for(var i=0;i<k.length-1;i++){o=o[k[i]];}o[k[k.length-1]]=v;}
 function setStatus(t){$("ast").textContent=t;}
 function mark(){dirty=true;setStatus("Cambios sin guardar");}
+function parsePrice(t){
+  t=String(t==null?"":t).replace(/[^\d.,]/g,"");
+  if(t.indexOf(",")>-1){var i=t.indexOf(",");t=t.slice(0,i).replace(/\./g,"")+"."+t.slice(i+1).replace(/[.,]/g,"");}
+  else if(/^\d+\.\d{1,2}$/.test(t)){}
+  else{t=t.replace(/\./g,"");}
+  return parseFloat(t)||0;
+}
+function fmtPrice(n){
+  n=Number(n)||0;var neg=n<0;n=Math.abs(n);
+  var a=n.toFixed(2).split("."),ent=a[0].replace(/\B(?=(\d{3})+(?!\d))/g,".");
+  return (neg?"-":"")+ent+(a[1]==="00"?"":","+a[1]);
+}
 function F(label,path,kind){
   var v=getP(path),area=kind==="area"||kind==="a3";
+  if(kind==="price"){return '<label class="f">'+esc(label)+'<input data-p="'+path+'" data-price="1" type="text" inputmode="decimal" value="'+esc(fmtPrice(v))+'"></label>';}
   return '<label class="f">'+esc(label)+(area?'<textarea data-p="'+path+'" rows="'+(kind==="a3"?3:9)+'">'+esc(v)+'</textarea>':'<input data-p="'+path+'"'+(kind==="num"?' type="number" min="0" step="any"':'')+' value="'+esc(v)+'">')+'</label>';
 }
 function IM(list,key,mv){return '<div class="imgs">'+list.map(function(u,i){return '<div class="im"><img src="'+esc(sImg(u))+'" alt=""><button data-act="rm" data-k="'+key+'" data-i="'+i+'" aria-label="Quitar">×</button>'+(mv?'<button class="m" data-act="mv" data-k="'+key+'" data-i="'+i+'" data-d="-1" aria-label="Mover antes">‹</button><button class="m r" data-act="mv" data-k="'+key+'" data-i="'+i+'" data-d="1" aria-label="Mover después">›</button>':'')+'</div>';}).join("")+'</div>';}
@@ -650,7 +671,7 @@ function tabHtml(){
     var h='<div class="bar">'+(selMode?'<button class="bt s" data-act="selmode">Cancelar selección</button><button class="bt" data-act="selarch">Archivar (<span class="selc">'+selIds().length+'</span>)</button><button class="bt d" data-act="seldel">Eliminar (<span class="selc">'+selIds().length+'</span>)</button>':'<button class="bt s" data-act="selmode">Selección múltiple</button>')+'</div>',n=0;
     S.products.forEach(function(p,i){
       if(p.arch){return;}n++;if(n<=(apage-1)*PER||n>apage*PER){return;}var b="products."+i;
-      h+='<div class="pe pq'+(openP[p.id]?" open":"")+'" data-pid="'+p.id+'"><div class="ph">'+(selMode?'<input type="checkbox" data-sel="'+p.id+'"'+(sel[p.id]?" checked":"")+'>':'')+'<button class="tgl" data-act="tg" data-i="'+i+'"><span class="cv">▸</span><b>#'+n+'</b><span class="pn">'+esc(p.name)+'</span>'+(p.hero?'<span class="tg">Hero</span>':'')+(p.exc?'<span class="tg">Excl.</span>':'')+'</button><span class="mvb"><button class="bt s" data-act="up" data-i="'+i+'" aria-label="Subir">▲</button><button class="bt s" data-act="dn" data-i="'+i+'" aria-label="Bajar">▼</button></span></div><div class="pbody">'+F("Nombre",b+".name")+F("Precio (Bs)",b+".price","num")+F("Unidades en stock (vacío = sin límite)",b+".stock","num")+F("Descripción (opcional)",b+".d","a3")+'<div class="f">Mostrar también en</div><div class="flags"><label class="chk"><input type="checkbox" data-flag="hero" data-pid="'+p.id+'"'+(p.hero?" checked":"")+'> Hero</label><label class="chk"><input type="checkbox" data-flag="exc" data-pid="'+p.id+'"'+(p.exc?" checked":"")+'> Exclusivos</label></div>'+IM(p.imgs,b+".imgs",true)+UP(b+".imgs","Subir imágenes",true)+'<div class="acts2"><button class="bt '+(p.out?"d":"s")+'" data-act="out" data-i="'+i+'">'+(p.out?"Quitar AGOTADO":"Marcar AGOTADO")+'</button><button class="bt s" data-act="arch" data-i="'+i+'">Archivar</button><button class="bt d" data-act="delp" data-i="'+i+'">Eliminar baraja</button></div></div></div>';
+      h+='<div class="pe pq'+(openP[p.id]?" open":"")+'" data-pid="'+p.id+'"><div class="ph">'+(selMode?'<input type="checkbox" data-sel="'+p.id+'"'+(sel[p.id]?" checked":"")+'>':'')+'<button class="tgl" data-act="tg" data-i="'+i+'"><span class="cv">▸</span><b>#'+n+'</b><span class="pn">'+esc(p.name)+'</span>'+(p.hero?'<span class="tg">Hero</span>':'')+(p.exc?'<span class="tg">Excl.</span>':'')+'</button><span class="mvb"><button class="bt s" data-act="up" data-i="'+i+'" aria-label="Subir">▲</button><button class="bt s" data-act="dn" data-i="'+i+'" aria-label="Bajar">▼</button></span></div><div class="pbody">'+F("Nombre",b+".name")+F("Precio (Bs)",b+".price","price")+F("Unidades en stock (vacío = sin límite)",b+".stock","num")+F("Descripción (opcional)",b+".d","a3")+'<div class="f">Mostrar también en</div><div class="flags"><label class="chk"><input type="checkbox" data-flag="hero" data-pid="'+p.id+'"'+(p.hero?" checked":"")+'> Hero</label><label class="chk"><input type="checkbox" data-flag="exc" data-pid="'+p.id+'"'+(p.exc?" checked":"")+'> Exclusivos</label></div>'+IM(p.imgs,b+".imgs",true)+UP(b+".imgs","Subir imágenes",true)+'<div class="acts2"><button class="bt '+(p.out?"d":"s")+'" data-act="out" data-i="'+i+'">'+(p.out?"Quitar AGOTADO":"Marcar AGOTADO")+'</button><button class="bt s" data-act="arch" data-i="'+i+'">Archivar</button><button class="bt d" data-act="delp" data-i="'+i+'">Eliminar baraja</button></div></div></div>';
     });
     return h+apager(tp0)+'<button class="bt" data-act="addp">+ Agregar baraja</button>';
   }
@@ -688,12 +709,13 @@ function refresh(p){if(p.indexOf("products")===0||p==="brand"){renderGrid();rend
 $("tabs").addEventListener("click",function(e){var t=e.target.getAttribute("data-tab");if(t){tab=t;drawTab();focusSec();}});
 $("abody").addEventListener("input",function(e){
   var p=e.target.getAttribute("data-p");if(!p){return;}
-  var v=e.target.value;if(e.target.type==="number"){v=/\.stock$/.test(p)?(v===""?"":Math.max(0,Math.floor(parseFloat(v)||0))):(parseFloat(v)||0);}
+  var v=e.target.value;if(e.target.hasAttribute("data-price")){v=parsePrice(v);}else if(e.target.type==="number"){v=/\.stock$/.test(p)?(v===""?"":Math.max(0,Math.floor(parseFloat(v)||0))):(parseFloat(v)||0);}
   setP(p,v);
   if(/^products\.\d+\.name$/.test(p)){var pe0=e.target.closest(".pe");if(pe0){pe0.querySelector(".pn").textContent=v;}}
   if(p==="contact.waLabel"){var d=dg(v);S.contact.wa=d.length===8?"591"+d:d;}
   mark();refresh(p);
 });
+$("abody").addEventListener("focusout",function(e){if(e.target.hasAttribute&&e.target.hasAttribute("data-price")){e.target.value=fmtPrice(parsePrice(e.target.value));}});
 function after(){mark();drawTab();renderGrid();renderCart();}
 $("abody").addEventListener("click",function(e){
   var pgb=e.target.closest("[data-apg]");if(pgb){if(!pgb.disabled){apage=+pgb.getAttribute("data-apg");drawTab();$("abody").scrollTop=0;}return;}
